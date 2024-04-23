@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rampy</title>
+  <style>
+    header {
+      text-align: center;
+      padding: 20px 0;
+      background-color: black;
+      color: white;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      color: white;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    #ramps-container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .ramp {
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      margin: 10px;
+      flex: 0 0 calc(25% - 20px);
+      border-radius: 5px;
+    }
+
+    .unload-btn {
+      background-color: #ff0000;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .unload-btn:hover {
+      background-color: #cc0000;
+    }
+
+    #controls {
+      margin-bottom: 20px;
+    }
+
+    #add-ramp-btn {
+      background-color: #008000;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    #add-ramp-btn:hover {
+      background-color: #006400;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Rampy do rozładunku</h1>
+  </header>
+  <main>
+    <div id="controls">
+      <select id="ramp-select">
+        <optgroup label="Rampy">
+          <option value="1">Rampa 1</option>
+          <option value="2">Rampa 2</option>
+          <option value="3">Rampa 3</option>
+          <option value="4">Rampa 4</option>
+          <option value="5">Rampa 5</option>
+          <option value="6">Rampa 6</option>
+          <option value="7">Rampa 7</option>
+          <option value="8">Rampa 8</option>
+          <option value="9">Rampa 9</option>
+          <option value="10">Rampa 10</option>
+          <option value="11">Rampa 11</option>
+          <option value="12">Rampa 12</option>
+          <option value="13">Rampa 13</option>
+          <option value="14">Rampa 14</option>
+          <option value="15">Rampa 15</option>
+        </optgroup>
+        <optgroup label="Surowiec i produkcja">
+          <option value="17">Rampa 17</option>
+          <option value="18">Rampa 18</option>
+          <option value="19">Rampa 19</option>
+          <option value="20">Rampa 20</option>
+          <option value="21">Rampa 21</option>
+          <option value="22">Rampa 22</option>
+          <option value="23">Rampa 23</option>
+          <option value="24">Rampa 24</option>
+          <option value="25">Rampa 25</option>
+          <option value="26">Rampa 26</option>
+          <option value="27">Rampa 27</option>
+          <option value="28">Rampa 28</option>
+          <option value="29">Rampa 29</option>
+          <option value="30">Rampa 30</option>
+        </optgroup>
+      </select>
+      <button id="add-ramp-btn">Dodaj rampę</button>
+    </div>
+    <div id="ramps-container"></div>
+  </main>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const rampsContainer = document.getElementById('ramps-container');
+      const rampSelect = document.getElementById('ramp-select');
+      const addRampBtn = document.getElementById('add-ramp-btn');
+
+      addRampBtn.addEventListener('click', function () {
+        const rampNumber = rampSelect.value;
+        const rampName = rampSelect.options[rampSelect.selectedIndex].text;
+        const rampDiv = document.createElement('div');
+        rampDiv.classList.add('ramp');
+        rampDiv.innerHTML = `
+          <p>Rampa ${rampName} <button class="unload-btn">Rozładowano</button></p>
+        `;
+        rampsContainer.appendChild(rampDiv);
+        localStorage.setItem(`ramp${rampNumber}`, 'loaded');
+        setupUnloadButtons(); // Wywołanie funkcji, która ustawia obsługę kliknięcia na przycisku "Rozładowano"
+      });
+
+      function setupUnloadButtons() {
+        const unloadButtons = document.querySelectorAll('.unload-btn');
+        unloadButtons.forEach(function (button) {
+          button.addEventListener('click', function () {
+            const rampName = this.parentNode.textContent.trim().replace('Rozładowano', '').trim(); // Pobranie nazwy rampy
+            const rampNumber = rampName.match(/\d+/)[0]; // Pobranie numeru rampy
+            localStorage.removeItem(`ramp${rampNumber}`); // Usunięcie rampy z localStorage
+            this.parentNode.parentNode.remove(); // Usunięcie diva z rampą
+          });
+        });
+      }
+
+      function loadRamps() {
+        rampsContainer.innerHTML = '';
+        for (let i = 1; i <= 30; i++) {
+          const rampStatus = localStorage.getItem(`ramp${i}`);
+          if (rampStatus === 'loaded') {
+            const rampDiv = document.createElement('div');
+            rampDiv.classList.add('ramp');
+            rampDiv.innerHTML = `
+              <p>Rampa ${i} <button class="unload-btn">Rozładowano</button></p>
+            `;
+            rampsContainer.appendChild(rampDiv);
+          }
+        }
+        setupUnloadButtons(); // Wywołanie funkcji, która ustawia obsługę kliknięcia na przycisku "Rozładowano" dla wczytanych ramp
+      }
+
+      loadRamps();
+    });
+  </script>
+</body>
+</html>
